@@ -1,0 +1,78 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %} Admin Dashboard {% endblock title %}
+
+{% block events %}
+<section class="my-10">
+  <div class="text-3xl">Today's Events:</div>
+
+  <ol class="list-decimal list-inside">
+    {% for today in todays %}
+    <li>{{today.name}}</li>
+    {% endfor %}
+  </ol>
+</section>
+
+<section class="my-10 text-xs md:text-base lg:text-base">
+  <!-- events -->
+  <div class="bg-white rounded-lg shadow-sm border">
+    <!-- table header -->
+    <div
+      class="grid grid-cols-5 text-gray-500 p-4 border-b border-gray-100 gap-4"
+    >
+      <div>EVENT NAME</div>
+      <div>CATEGORY</div>
+      <div>PARTICIPANTS</div>
+      <div>LOCATION</div>
+      <div>ACTION</div>
+    </div>
+
+    <!-- table elements -->
+    {% for event in events %}
+    <div class="divide-y divide-gray-100">
+      <div class="grid grid-cols-5 items-center p-4 gap-4">
+        <!-- NAME -->
+        <div>
+          <div class=""> {{event.name}} </div>
+        </div>
+
+        <!-- CATEGORY -->
+        <div>
+          <span
+            class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-500"
+          >
+            {{event.category}}
+          </span>
+        </div>
+
+        <!-- PARTICIPANTS -->
+        <div class="flex -space-x-2">
+          {% for part in event.participant.all %}
+          <div
+            class="w-8 h-8 rounded-full bg-blue-500 flex justify-center items-center text-white text-sm border-2 border-white"
+          >
+            {{part.name|slice:":1"}}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- LOCATION -->
+        <div>
+          <span class="text-sm text-gray-500"> {{event.location}} </span>
+        </div>
+
+        <!-- ACTIONS -->
+        <div>
+          <form action="{% url 'delete-event' event.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="px-2 rounded-md bg-rose-500 text-sm text-white">DELETE</button>
+          </form>
+
+          <a href="{% url 'update-event' event.id %}" class="px-2 rounded-md bg-orange-500 text-sm text-white">UPDATE</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock events %}
