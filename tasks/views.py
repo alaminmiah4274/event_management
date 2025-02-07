@@ -18,6 +18,29 @@ def load_counts():
 	return counts
 
 
+
+def add_category(request):
+	category_form = CategoryModelForm()
+
+	if request.method == "POST":
+		category_form = CategoryModelForm(request.POST)
+
+		if category_form.is_valid():
+			category = category_form.save()
+
+
+			messages.success(request, "Category Created Successfully")
+			return redirect("add-category")
+
+
+	context = {
+		"category_form": category_form
+	}
+
+	return render(request, "form/category_form.html", context)
+
+
+
 def create_event(request):
 	event_form = EventModelForm()
 
@@ -29,6 +52,9 @@ def create_event(request):
 
 			messages.success(request, "Event Created Successfully")
 			return redirect("create-event")
+		else:
+			messages.error(request, "The event date cannot be in the past.")
+			return redirect("create-event")
 
 
 	context = {
@@ -36,6 +62,30 @@ def create_event(request):
 	}
 
 	return render(request, "form/event_form.html", context)
+
+
+def add_participant(request):
+	participant_form = ParticipantModelForm()
+
+	if request.method == "POST":
+		participant_form = ParticipantModelForm(request.POST)
+
+		if participant_form.is_valid():
+			participant = participant_form.save()
+			print("object:", participant)
+
+			messages.success(request, "Participant Created Successfully")
+			return redirect("add-participant")
+		else:
+			print("error:", participant_form.errors)
+
+
+	context = {
+		"participant_form": participant_form
+	}
+
+	return render(request, "form/participant_form.html", context)
+
 
 
 def update_event(request, id):
@@ -98,3 +148,12 @@ def admin_dashboard(request):
 
 	return render(request, "dashboard/admin_dashboard.html", context)
 
+
+def today_events(request):
+	todays = Event.objects.select_related("category").prefetch_related("participant").filter(date = date.today())
+
+	context = {
+		"todays": todays
+	}
+
+	return render(request, "today_events/today_events.html", context)

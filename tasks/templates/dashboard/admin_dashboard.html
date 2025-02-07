@@ -3,16 +3,6 @@
 {% block title %} Admin Dashboard {% endblock title %}
 
 {% block events %}
-<section class="my-10">
-  <div class="text-3xl">Today's Events:</div>
-
-  <ol class="list-decimal list-inside">
-    {% for today in todays %}
-    <li>{{today.name}}</li>
-    {% endfor %}
-  </ol>
-</section>
-
 <section class="my-10 text-xs md:text-base lg:text-base">
   <!-- events -->
   <div class="bg-white rounded-lg shadow-sm border">

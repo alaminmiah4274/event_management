@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -12,6 +14,14 @@ class Event(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	def clean(self):
+		if self.date is not None and self.date < timezone.now().date():
+			raise ValidationError("The event date can not be in the past.")
+
+	def save(self, *args, **kwargs):
+		self.clean()
+		super().save(*args, **kwargs)
 
 
 class Participant(models.Model):

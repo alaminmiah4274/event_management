@@ -1,0 +1,58 @@
+{% extends "header/header.html" %}
+
+{% block title %}Today's Events{% endblock title %}
+
+{% block contents %}
+<section class="my-10">
+  <div class="text-3xl">Today's Events:</div>
+
+  <div class="bg-white rounded-lg shadow-sm border my-5">
+    <!-- table header -->
+    <div
+      class="grid grid-cols-4 text-gray-500 p-4 border-b border-gray-100 gap-4"
+    >
+      <div>EVENT NAME</div>
+      <div>CATEGORY</div>
+      <div>PARTICIPANTS</div>
+      <div>LOCATION</div>
+    </div>
+
+    <!-- table elements -->
+    {% for today in todays %}
+    <div class="divide-y divide-gray-100">
+      <div class="grid grid-cols-4 items-center p-4 gap-4">
+        <!-- NAME -->
+        <div>
+          <div class=""> {{today.name}} </div>
+        </div>
+
+        <!-- CATEGORY -->
+        <div>
+          <span
+            class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-500"
+          >
+            {{today.category}}
+          </span>
+        </div>
+
+        <!-- PARTICIPANTS -->
+        <div class="flex -space-x-2">
+          {% for part in today.participant.all %}
+          <div
+            class="w-8 h-8 rounded-full bg-blue-500 flex justify-center items-center text-white text-sm border-2 border-white"
+          >
+            {{part.name|slice:":1"}}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- LOCATION -->
+        <div>
+          <span class="text-sm text-gray-500"> {{today.location}} </span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock contents %}

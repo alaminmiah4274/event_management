@@ -1,0 +1,21 @@
+{% extends "header/header.html" %}
+
+{% block title %}Participant Form{% endblock title %}
+
+{% block contents %}
+<section>
+	<div class="border w-1/2 mx-auto my-10 p-5 bg-white">
+		{% if messages %}
+			{% for message in messages %}
+				<div class="px-2 py-1 {% if message.tags == 'success' %} bg-green-500 {% endif %}">{{message}}</div>
+			{% endfor %}
+		{% endif %}
+		<div class="text-center text-3xl mb-5">Add A Participant</div>
+		<form method="POST">
+			{% csrf_token %}
+			{{participant_form}}
+			<button type="submit" class="px-2 py-1 bg-pink-500 rounded-lg text-white mt-5">SUBMIT</button>
+		</form>
+	</div>
+</section>
+{% endblock contents %}

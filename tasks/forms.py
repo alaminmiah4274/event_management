@@ -1,5 +1,7 @@
 from django import forms
 from tasks.models import Event, Participant, Category
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class StyleFormMixin:
@@ -8,6 +10,11 @@ class StyleFormMixin:
 	def style_widgets(self):
 		for field_name, field in self.fields.items():
 			if isinstance(field.widget,  forms.TextInput):
+				field.widget.attrs.update({
+					"class": self.default_class,
+					"placeholder": f"Enter {field.label.lower()}"
+				})
+			elif isinstance(field.widget,  forms.EmailInput):
 				field.widget.attrs.update({
 					"class": self.default_class,
 					"placeholder": f"Enter {field.label.lower()}"
@@ -41,6 +48,13 @@ class EventModelForm(StyleFormMixin, forms.ModelForm):
 		model = Event
 		fields = ["name", "description", "date", "location", "category"]
 
+		labels = {
+			"name": "Event Name",
+			"description": "Event Description",
+			"date": "Date",
+			"location": "Location Name"
+		}
+
 		widgets = {
 			"name": forms.TextInput(),
 			"description": forms.Textarea(),
@@ -52,10 +66,12 @@ class EventModelForm(StyleFormMixin, forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.style_widgets()
-		self.fields["name"].label = "Event Name"
-		self.fields["description"].label = "Event Description"
-		self.fields["location"].label = "Event Location"
-		self.fields["category"].label = "Category Name"
+
+	def clean_date(self):
+		date = self.cleaned_data.get("date")
+		if date is not None and date < timezone.now().date():
+			raise forms.ValidationError("The event date can not be in the past.")
+		return date
 
 
 
@@ -63,6 +79,12 @@ class ParticipantModelForm(StyleFormMixin, forms.ModelForm):
 	class Meta:
 		model = Participant
 		fields = ["name", "email", "event"]
+
+		labels = {
+			"name": "Participant Name",
+			"email": "Participant Email",
+			"event": "Event Name"
+		}
 
 		widgets = {
 			"name": forms.TextInput(),
@@ -73,22 +95,24 @@ class ParticipantModelForm(StyleFormMixin, forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.style_widgets()
-		self.fields["name"].label = "Participant Name"
-		self.fields["email"].label = "Participant Email"
-		self.fields["event"].label = "Event Name"
 
 
 
 class CategoryModelForm(StyleFormMixin, forms.ModelForm):
 	class Meta:
 		model = Category
-		fields = ["description"]
+		fields = ["name", "description"]
+
+		labels = {
+			"name": "Category Name",
+			"description": "Category Description"
+		}
 
 		widgets = {
+			"name": forms.TextInput(),
 			"description": forms.Textarea()
 		}
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.style_widgets()
-		self.fields["description"].label = "Category Description"

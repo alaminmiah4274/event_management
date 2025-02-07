@@ -1,10 +1,10 @@
 {% extends "header/header.html" %}
 
-{% block title %}Event Form{% endblock title %}
+{% block title %}Category Form{% endblock title %}
 
 {% block contents %}
 <section>
-	<div class="border sm:w-full lg:w-1/2 md:w-1/2 mx-auto my-10 p-5 bg-white">
+	<div class="border w-1/2 mx-auto my-10 p-5 bg-white">
 		{% if messages %}
 			{% for message in messages %}
 				{% if message.tags == 'success' %}
@@ -15,10 +15,10 @@
 				{% endif %}
 			{% endfor %}
 		{% endif %}
-		<div class="text-center text-3xl mb-5">Create An Event</div>
-		<form method="POST">
+		<div class="text-center text-3xl mb-5">Add A Category</div>
+		<form action="{% url 'add-category' %}" method="POST">
 			{% csrf_token %}
-			{{event_form}}
+			{{category_form}}
 			<button type="submit" class="px-2 py-1 bg-pink-500 rounded-lg text-white mt-5">SUBMIT</button>
 		</form>
 	</div>
