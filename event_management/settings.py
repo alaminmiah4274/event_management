@@ -106,8 +106,8 @@ WSGI_APPLICATION = "event_management.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default=config("DEFAULT", default=""),
-        conn_max_age=config("CONN_MAX_AGE", cast=int),
+        default="postgresql://event_manager_db_8s5u_user:kux6JI06zukKYeUYUJ0LCCttTduDGGxS@dpg-cui7jaaj1k6c73aq9nc0-a.oregon-postgres.render.com/event_manager_db_8s5u",
+        conn_max_age=600,
     )
 }
 
@@ -170,8 +170,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_USE_TLS = config("EMAIL_USE_TLS")
-EMAIL_PORT = config("EMAIL_PORT")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
