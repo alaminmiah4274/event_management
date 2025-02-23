@@ -1,10 +1,10 @@
-{% extends "header/header.html" %}
+{% extends "base.html" %}
 
-{% block title %}Today's Events{% endblock title %}
+{% block title %}Home{% endblock title %}
 
 {% block contents %}
-<section class="my-10">
-  <div class="text-3xl">Today's Events:</div>
+<section class="my-10 mb-64">
+  <div class="text-xl">Today's Events:</div>
 
   <div class="bg-white rounded-lg shadow-sm border my-5">
     <!-- table header -->
@@ -13,7 +13,7 @@
     >
       <div>EVENT NAME</div>
       <div>CATEGORY</div>
-      <div>PARTICIPANTS</div>
+      <div>TIME</div>
       <div>LOCATION</div>
     </div>
 
@@ -36,14 +36,8 @@
         </div>
 
         <!-- PARTICIPANTS -->
-        <div class="flex -space-x-2">
-          {% for part in today.participant.all %}
-          <div
-            class="w-8 h-8 rounded-full bg-blue-500 flex justify-center items-center text-white text-sm border-2 border-white"
-          >
-            {{part.name|slice:":1"}}
-          </div>
-          {% endfor %}
+        <div class="text-sm text-gray-500">
+          <div>{{today.time}}</div>
         </div>
 
         <!-- LOCATION -->

@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% block title %}Admin Dashboard{% endblock title %}</title>
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/output.css' %}">
+</head>
+<body>
+	<header class="bg-amber-400 py-6">
+		<div class="flex items-center justify-between max-w-[1200px] mx-auto">
+		    <div>
+		      <a href="{% url 'home' %}" class="text-lg lg:text-2xl"
+		        >Event Management</a
+		      >
+		    </div>
+
+		    <div class="flex items-center gap-3">
+		      <a href="{% url 'dashboard' %}">Dashboard</a>
+		      <a href="{% url 'create-group' %}">Create Group</a>
+		      <a href="{% url 'group-list' %}">Group List</a>
+		    </div>
+
+		    <div>
+		      <form action="{% url 'sign-out' %}" method="POST">
+		        {% csrf_token %}
+		        <button class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-700">
+		          Sign Out
+		        </button>
+		      </form>
+		    </div>
+		 </div>
+	</header>
+
+	<main>
+		{% block admin_activites %}
+			{% include "admin/participant_list.html" %}
+		{% endblock admin_activites %}
+	</main>
+</body>
+</html>

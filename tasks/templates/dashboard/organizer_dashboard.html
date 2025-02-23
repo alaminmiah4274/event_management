@@ -1,6 +1,6 @@
 {% extends "dashboard/dashboard.html" %}
 
-{% block title %} Admin Dashboard {% endblock title %}
+{% block title %} Organizer Dashboard {% endblock title %}
 
 {% block events %}
 <section class="my-10 text-xs md:text-base lg:text-base">
@@ -37,11 +37,11 @@
 
         <!-- PARTICIPANTS -->
         <div class="flex -space-x-2">
-          {% for part in event.participant.all %}
+          {% for part in event.user.all %}
           <div
             class="w-8 h-8 rounded-full bg-blue-500 flex justify-center items-center text-white text-sm border-2 border-white"
           >
-            {{part.name|slice:":1"}}
+            {{part.username|slice:":1"}}
           </div>
           {% endfor %}
         </div>

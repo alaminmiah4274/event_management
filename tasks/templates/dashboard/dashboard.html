@@ -1,15 +1,12 @@
-<!-- prettier-ignore -->
-{% extends "header/header.html" %}
+{% extends "base.html" %}
 
-<!-- prettier-ignore -->
 {% block title %}Dashboard{% endblock title %}
 
-<!-- prettier-ignore -->
 {% block contents %}
 <section>
   <section class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
     <!-- total events -->
-    <a href="{% url 'admin-dashboard' %}">
+    <a href="{% url 'organizer-dashboard' %}">
       <div class="border bg-white p-5 rounded-md">
         <div class="text-gray-400">TOTAL EVENTS</div>
 
@@ -61,7 +58,7 @@
     </div>
 
     <!-- upcoming events -->
-    <a href="{% url 'admin-dashboard' %}?type=upcoming">
+    <a href="{% url 'organizer-dashboard' %}?type=upcoming">
       <div class="border bg-white p-5 rounded-md">
         <div class="text-gray-400">UPCOMING EVENTS</div>
 
@@ -88,7 +85,7 @@
     </a>
 
     <!-- previous events -->
-    <a href="{% url 'admin-dashboard' %}?type=previous">
+    <a href="{% url 'organizer-dashboard' %}?type=previous">
       <div class="border bg-white p-5 rounded-md">
         <div class="text-gray-400">PREVIOUS EVENTS</div>
 
@@ -116,25 +113,17 @@
   </section>
 
   <div>
-    <!-- prettier-ignore -->
     {% if messages %}
-    <!-- prettier-ignore -->
 	    {% for message in messages %}
 		    <div class="px-2 py-1 {% if message.tags == 'success' %} bg-green-500 {% endif %}">
-		      <!-- prettier-ignore -->
 		      {{message}}
 		    </div>
-	    <!-- prettier-ignore -->
 	    {% endfor %}
-    <!-- pretteri-ignore -->
     {% endif %}
   </div>
 
-  <!-- admin dashboard section -->
-  <!-- prettier-ignore -->
   {% block events %}
-  <!-- prettier-ignore -->
+
   {% endblock events %}
 </section>
-<!-- prettier-ignore -->
 {% endblock contents %}

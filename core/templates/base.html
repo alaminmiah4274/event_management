@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% block title %} {% endblock title %}</title>
+
+	<!-- css link -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/output.css' %}">
+</head>
+<body class="bg-gray-50">
+	<!-- HEADER PART -->
+	{% if request.user.is_authenticated %}
+      <!-- SHOW NAVBAR LOG IN -->
+      {% include "logged_nav.html" %}
+    {% else %}
+      <!-- SHOW NAVBAR LOG OUT -->
+      {% include "non_logged_nav.html" %}
+    {% endif %}
+
+
+	<!-- MAIN PART -->
+	<main class="max-w-[1200px] mx-auto">
+		{% block contents %}
+
+		{% endblock contents %}
+	</main>
+	
+
+	<!-- FOOTER PART -->
+    {% include "footer.html" %}
+</body>
+</html>

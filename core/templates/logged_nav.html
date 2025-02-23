@@ -1,0 +1,24 @@
+<header class="bg-amber-400 py-6">
+  <div class="flex items-center justify-between max-w-[1200px] mx-auto">
+    <div>
+      <a href="{% url 'home' %}" class="text-lg lg:text-2xl"
+        >Event Management</a
+      >
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'create-event' %}">Create Event</a>
+      <a href="{% url 'add-category' %}">Create category</a>
+    </div>
+
+    <div>
+      <form action="{% url 'sign-out' %}" method="POST">
+        {% csrf_token %}
+        <button class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-700">
+          Sign Out
+        </button>
+      </form>
+    </div>
+  </div>
+</header>
