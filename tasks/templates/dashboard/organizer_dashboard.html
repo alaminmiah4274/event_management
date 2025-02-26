@@ -37,11 +37,11 @@
 
         <!-- PARTICIPANTS -->
         <div class="flex -space-x-2">
-          {% for part in event.user.all %}
+          {% for part in event.participant.all %}
           <div
             class="w-8 h-8 rounded-full bg-blue-500 flex justify-center items-center text-white text-sm border-2 border-white"
           >
-            {{part.username|slice:":1"}}
+            {{part.user.first_name|slice:":1"}}
           </div>
           {% endfor %}
         </div>

@@ -6,15 +6,15 @@ from datetime import date
 
 
 def home(request):
-    todays = (
-        Event.objects.select_related("category")
-        .prefetch_related("participant")
-        .filter(date=date.today())
+    upcoming_events = Event.objects.select_related("category").filter(
+        date__gt=date.today()
     )
 
-    context = {"todays": todays}
+    today_events = Event.objects.select_related("category").filter(date=date.today())
 
-    return render(request, "home.html", context)
+    context = {"today_events": today_events, "upcoming_events": upcoming_events}
+
+    return render(request, "home/home.html", context)
 
 
 def no_permission(request):

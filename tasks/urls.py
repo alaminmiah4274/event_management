@@ -7,6 +7,7 @@ from tasks.views import (
     add_category,
     dashboard,
     participant_dashboard,
+    participate,
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path("add-category/", add_category, name="add-category"),
     path("dashboard/", dashboard, name="dashboard"),
     path("participant-dashboard/", participant_dashboard, name="participant-dashboard"),
+    path("participate/<int:event_id>/", participate, name="participate"),
 ]

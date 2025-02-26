@@ -12,7 +12,7 @@ class Event(models.Model):
     date = models.DateField()
     time = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=250)
-    user = models.ManyToManyField(User, related_name="event")
+    # user = models.ManyToManyField(User, related_name="event")
     asset = models.ImageField(
         upload_to="task_asset",
         blank=True,
@@ -42,6 +42,14 @@ class Event(models.Model):
 
 #     def __str__(self):
 #         return self.name
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    event = models.ManyToManyField(Event, related_name="participant")
+
+    def __str__(self):
+        return f"{self.user.username}"
 
 
 class Category(models.Model):

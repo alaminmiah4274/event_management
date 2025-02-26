@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block contents %}
+<section class="my-10 mb-64">
+  {% include "home/upcoming_events.html" %}
+  {% include "home/today_events.html" %}
+</section>
+{% endblock contents %}

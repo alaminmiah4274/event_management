@@ -1,0 +1,65 @@
+<section class="my-10">
+  <div class="text-xl">Upcoming Events:</div>
+
+  <ul>
+    {% if messages %}
+      {% for message in messages %}
+        <li class="bg-green-500 px-2 py-1 text-white">{{message}}</li>
+      {% endfor %}
+    {% endif %}
+  </ul>
+
+  <div class="bg-white rounded-lg shadow-sm border my-5">
+    <!-- table header -->
+    <div
+      class="grid grid-cols-5 text-gray-500 p-4 border-b border-gray-100 gap-4"
+    >
+      <div>EVENT NAME</div>
+      <div>CATEGORY</div>
+      <div>LOCATION</div>
+      <div>TIME</div>
+      <div>ACTION</div>
+    </div>
+
+    <!-- table elements -->
+    {% for event in upcoming_events %}
+    <div class="divide-y divide-gray-100">
+      <div class="grid grid-cols-5 items-center p-4 gap-4">
+        <!-- NAME -->
+        <div>
+          <div class=""> {{event.name}} </div>
+        </div>
+
+        <!-- CATEGORY -->
+        <div>
+          <span
+            class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-500"
+          >
+            {{event.category}}
+          </span>
+        </div>
+
+        <!-- LOCATION -->
+        <div>
+          <span class="text-sm text-gray-500"> {{event.location}} </span>
+        </div>
+
+        <!-- TIME -->
+        <div class="text-sm text-gray-500">
+          <div>{{event.time}}</div>
+        </div>
+
+        <!-- ACTION -->
+        <div>
+          <form action="{% url 'participate' event.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="px-2 py-1 bg-blue-500 hover:bg-blue-700 rounded-md text-white {% if request.user.is_authenticated and event in request.user.profile.event.all %}bg-gray-300{% endif %}" {% if request.user.is_authenticated and event in request.user.profile.event.all %}disabled{% endif %}>
+                Participate
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
