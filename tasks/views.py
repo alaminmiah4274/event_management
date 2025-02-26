@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from tasks.models import Event
+from tasks.models import Event, Profile
 from django.db.models import Q, Count
 from datetime import date
 from tasks.forms import EventModelForm, CategoryModelForm
@@ -7,9 +7,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import (
     permission_required,
     login_required,
-    user_passes_test,
 )
 from users.views import is_admin
+from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -24,7 +24,7 @@ def is_participant(user):
 def load_counts():
     counts = Event.objects.aggregate(
         total_events=Count("id", distinct=True),
-        total_participants=Count("user", distinct=True),
+        total_participants=Count("participant", distinct=True),
         upcoming=Count("id", distinct=True, filter=Q(date__gt=date.today())),
         previous=Count("id", distinct=True, filter=Q(date__lt=date.today())),
     )
@@ -110,12 +110,11 @@ def delete_event(request, id):
 @login_required
 @permission_required("tasks.view_event", login_url="no-permission")
 def organizer_dashboard(request):
-    print("from is_admin:", request.user.get_all_permissions())
-
     type = request.GET.get("type", "all")
 
-    base_query = Event.objects.select_related("category").prefetch_related("user")
-    todays = base_query.filter(date=date.today())
+    base_query = Event.objects.select_related("category").prefetch_related(
+        "participant"
+    )
 
     if type == "upcoming":
         events = base_query.filter(date__gt=date.today())
@@ -126,7 +125,7 @@ def organizer_dashboard(request):
     elif type == "all":
         events = base_query.all()
 
-    context = {"events": events, "counts": load_counts(), "todays": todays}
+    context = {"events": events, "counts": load_counts()}
 
     return render(request, "dashboard/organizer_dashboard.html", context)
 
@@ -155,7 +154,34 @@ def dashboard(request):
     return redirect("no-permission")
 
 
+@login_required
 def participant_dashboard(request):
-    context = {}
+    profile = request.user.profile
+    events = profile.event.all().select_related("category")
+
+    print(events)
+
+    context = {"events": events}
 
     return render(request, "dashboard/participant_dashboard.html", context)
+
+
+@login_required
+def participate(request, event_id):
+    if request.method == "POST":
+        event = Event.objects.get(id=event_id)
+        if request.user.is_authenticated:
+            profile = request.user.profile
+            if event in profile.event.all():
+                messages.warning(
+                    request, "You have already participated in this event."
+                )
+            else:
+                profile.event.add(event)
+                messages.success(
+                    request, "You have successfully participated in the event."
+                )
+                return redirect("home")
+    else:
+        messages.error(request, "You must be logged in to participate.")
+        return redirect("home", event.id)

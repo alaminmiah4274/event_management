@@ -52,7 +52,6 @@ class EventModelForm(StyleFormMixin, forms.ModelForm):
         fields = [
             "name",
             "description",
-            "user",
             "date",
             "location",
             "asset",
@@ -64,7 +63,7 @@ class EventModelForm(StyleFormMixin, forms.ModelForm):
             "description": "Event Description",
             "date": "Date",
             "location": "Location Name",
-            "user": "Participants",
+            "asset": "Image",
         }
 
         widgets = {
@@ -73,7 +72,6 @@ class EventModelForm(StyleFormMixin, forms.ModelForm):
             "date": forms.SelectDateWidget(),
             "location": forms.TextInput(),
             "category": forms.RadioSelect(),
-            "user": forms.CheckboxSelectMultiple(),
         }
 
     def clean_date(self):

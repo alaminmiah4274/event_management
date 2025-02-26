@@ -3,7 +3,50 @@
 {% block title %}Participant Dashboard{% endblock title %}
 
 {% block contents %}
-<section class="flex items-center justify-center my-64">
-	<h1>This is participant dashboard but nothing is shown</h1>
+<section class="my-10">
+  <div class="text-xl">You have participated at:</div>
+
+  <div class="bg-white rounded-lg shadow-sm border my-5">
+    <!-- table header -->
+    <div
+      class="grid grid-cols-4 text-gray-500 p-4 border-b border-gray-100 gap-4"
+    >
+      <div>EVENT NAME</div>
+      <div>CATEGORY</div>
+      <div>TIME</div>
+      <div>LOCATION</div>
+    </div>
+
+    <!-- table elements -->
+    {% for event in events %}
+    <div class="divide-y divide-gray-100">
+      <div class="grid grid-cols-4 items-center p-4 gap-4">
+        <!-- NAME -->
+        <div>
+          <div class=""> {{event.name}} </div>
+        </div>
+
+        <!-- CATEGORY -->
+        <div>
+          <span
+            class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-500"
+          >
+            {{event.category}}
+          </span>
+        </div>
+
+        <!-- TIME -->
+        <div class="text-sm text-gray-500">
+          <div>{{event.time}}</div>
+        </div>
+
+        <!-- LOCATION -->
+        <div>
+          <span class="text-sm text-gray-500"> {{event.location}} </span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </section>
 {% endblock contents %}

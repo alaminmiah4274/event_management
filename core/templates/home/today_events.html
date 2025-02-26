@@ -1,9 +1,4 @@
-{% extends "base.html" %}
-
-{% block title %}Home{% endblock title %}
-
-{% block contents %}
-<section class="my-10 mb-64">
+<section class="my-10">
   <div class="text-xl">Today's Events:</div>
 
   <div class="bg-white rounded-lg shadow-sm border my-5">
@@ -18,7 +13,7 @@
     </div>
 
     <!-- table elements -->
-    {% for today in todays %}
+    {% for today in today_events %}
     <div class="divide-y divide-gray-100">
       <div class="grid grid-cols-4 items-center p-4 gap-4">
         <!-- NAME -->
@@ -35,7 +30,7 @@
           </span>
         </div>
 
-        <!-- PARTICIPANTS -->
+        <!-- TIME -->
         <div class="text-sm text-gray-500">
           <div>{{today.time}}</div>
         </div>
@@ -49,4 +44,3 @@
     {% endfor %}
   </div>
 </section>
-{% endblock contents %}
