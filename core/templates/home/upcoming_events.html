@@ -46,14 +46,14 @@
 
         <!-- TIME -->
         <div class="text-sm text-gray-500">
-          <div>{{event.time}}</div>
+          <div>{{event.date}}</div>
         </div>
 
         <!-- ACTION -->
         <div>
           <form action="{% url 'participate' event.id %}" method="POST">
             {% csrf_token %}
-            <button type="submit" class="px-2 py-1 bg-blue-500 hover:bg-blue-700 rounded-md text-white {% if request.user.is_authenticated and event in request.user.profile.event.all %}bg-gray-300{% endif %}" {% if request.user.is_authenticated and event in request.user.profile.event.all %}disabled{% endif %}>
+            <button type="submit" class="px-2 py-1 bg-blue-500 hover:bg-blue-700 rounded-md text-white {% if request.user.is_authenticated and event in request.user.event.all %}bg-gray-300{% endif %}" {% if request.user.is_authenticated and event in request.user.profile.event.all %}disabled{% endif %}>
                 Participate
             </button>
           </form>

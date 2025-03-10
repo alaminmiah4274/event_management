@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -44,12 +43,16 @@ class Event(models.Model):
 #         return self.name
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    event = models.ManyToManyField(Event, related_name="participant")
+# class Profile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     event = models.ManyToManyField(Event, related_name="participant")
+#     profile_image = models.ImageField(
+#         upload_to="profile_images", blank=True, default="profile_images/anonymous.jpg"
+#     )
+#     bio = models.TextField(blank=True)
 
-    def __str__(self):
-        return f"{self.user.username}"
+#     def __str__(self):
+#         return f"{self.user.username}"
 
 
 class Category(models.Model):

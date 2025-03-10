@@ -4,9 +4,13 @@ from users.forms import (
     SignInForm,
     CreateGroupModelForm,
     AssignRoleForm,
+    EditProfileForm,
+    CustomPasswordChangeForm,
+    CustomPasswordResetForm,
+    CustomPasswordResetConfirmForm,
 )
 from django.contrib.auth import login, logout
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
 from django.contrib.auth.decorators import (
@@ -14,9 +18,21 @@ from django.contrib.auth.decorators import (
     user_passes_test,
 )
 from django.db.models import Prefetch
+from django.contrib.auth import get_user_model
+from django.views.generic import TemplateView, UpdateView, FormView
+from django.urls import reverse_lazy
+from django.contrib.auth.views import (
+    PasswordChangeView,
+    PasswordResetView,
+    PasswordResetConfirmView,
+)
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.views import View
 
 
 # Create your views here.
+
+User = get_user_model()
 
 
 # for user test
@@ -102,47 +118,64 @@ def admin_dashboard(request):
     return render(request, "admin/dashboard.html", context)
 
 
-@user_passes_test(is_admin, login_url="no-permission")
-def create_group(request):
-    form = CreateGroupModelForm()
+# -------
+class CreateGroupView(UserPassesTestMixin, View):
+    template_name = "admin/create_group.html"
+    login_url = "no-permission"
 
-    if request.method == "POST":
+    def test_func(self):
+        return is_admin(self.request.user)
+
+    def get(self, request):
+        form = CreateGroupModelForm()
+        context = {"form": form}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
         form = CreateGroupModelForm(request.POST)
 
         if form.is_valid():
             group = form.save()
-
             messages.success(
                 request, f"Group {group.name} has been created successfully"
             )
             return redirect("create-group")
 
-    context = {"form": form}
+        context = {"form": form}
+        return render(request, self.template_name, context)
 
-    return render(request, "admin/create_group.html", context)
 
+# ---------
+class AssignRoleView(UserPassesTestMixin, FormView):
+    template_name = "admin/assign_role.html"
+    form_class = AssignRoleForm
+    success_url = reverse_lazy("admin-dashboard")
 
-@user_passes_test(is_admin, login_url="no-permission")
-def assign_role(request, user_id):
-    user = User.objects.get(id=user_id)
-    form = AssignRoleForm()
+    def test_func(self):
+        return is_admin(self.request.user)
 
-    if request.method == "POST":
-        form = AssignRoleForm(request.POST)
-        if form.is_valid():
-            role = form.cleaned_data.get("role")
-            user.groups.clear()
-            user.groups.add(role)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.kwargs.get("user_id")
+        user = User.objects.get(id=user_id)
+        context["user"] = user
+        return context
 
-            messages.success(
-                request,
-                f"User {user.username} has been assigned to the {role.name} role",
-            )
-            return redirect("admin-dashboard")
+    def form_valid(self, form):
+        user_id = self.kwargs.get("user_id")
+        user = User.objects.get(id=user_id)
+        role = form.cleaned_data.get("role")
 
-    context = {"form": form}
+        user.groups.clear()
+        user.groups.add(role)
 
-    return render(request, "admin/assign_role.html", context)
+        # success message
+        messages.success(
+            self.request,
+            f"User {user.username} has been assigned to the {role.name} role",
+        )
+
+        return super().form_valid(form)
 
 
 @user_passes_test(is_admin, login_url="no-permission")
@@ -189,13 +222,75 @@ def delete_group(request, group_id):
         return redirect("delete-group", group_id)
 
 
+class ProfileView(TemplateView):
+    template_name = "accounts/profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        context["username"] = user.username
+        context["email"] = user.email
+        context["name"] = user.get_full_name()
+        context["phone"] = user.phone_number
+        context["member_since"] = user.date_joined
+        context["last_login"] = user.last_login
+        context["profile_image"] = user.profile_image
+
+        return context
+
+
+class EditProfileView(UpdateView):
+    model = User
+    form_class = EditProfileForm
+    template_name = "accounts/update_profile.html"
+    context_object_form = "form"
+    success_url = reverse_lazy("profile")
+
+    def get_object(self):
+        return self.request.user
+
+    def form_save(self, form):
+        form.save()
+        return super().form_save(form)
+
+
+class ChangePassword(PasswordChangeView):
+    template_name = "accounts/password_change.html"
+    form_class = CustomPasswordChangeForm
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = "registration/reset_password.html"
+    form_class = CustomPasswordResetForm
+    success_url = reverse_lazy("sign-in")
+    html_email_template_name = "registration/reset_email.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["protocol"] = "https" if self.request.is_secure() else "http"
+        context["domain"] = self.request.get_host()
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "A reset email sent. Please check your email")
+        return super().form_valid(form)
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "registration/reset_password.html"
+    form_class = CustomPasswordResetConfirmForm
+    success_url = reverse_lazy("sign-in")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Password has been reset successfully")
+        return super().form_valid(form)
+
+
 """
-wiz_khalifa: Zwi@2024
-admin: admin@5078
+wiz_khalifa: Lifa@2024
 kendra_sunderland: Land@2024
-sabanna_bond: Anna@2024
-andrew_tate: Rew@2024
-dance_party: Ance@2024
-admin: admin@2024
-participant_user: Pant@2024
+sabanna_bond: Anna@2024-->Banna@2024
+andrew_tate: Rew@2024 | organizer
+admin: admin@2024-->admin#2024
 """

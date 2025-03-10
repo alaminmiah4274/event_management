@@ -23,7 +23,7 @@
       <div class="grid grid-cols-5 items-center p-4 gap-4">
         <!-- NAME -->
         <div>
-          <div class=""> {{event.name}} </div>
+          <a href="{% url 'event-detail' event.id %}">{{event.name}}</a>
         </div>
 
         <!-- CATEGORY -->
@@ -37,29 +37,24 @@
 
         <!-- PARTICIPANTS -->
         <div class="flex -space-x-2">
-          {% for part in event.participant.all %}
+          {% for participant in event.participant.all %}
           <div
             class="w-8 h-8 rounded-full bg-blue-500 flex justify-center items-center text-white text-sm border-2 border-white"
           >
-            {{part.user.first_name|slice:":1"}}
+            {{participant.first_name|slice:":1"}}
           </div>
           {% endfor %}
+        </div>
+
+        <!-- DATE -->
+        <div>
+          <span class="text-sm text-gray-500"> {{event.date}} </span>
         </div>
 
         <!-- LOCATION -->
         <div>
           <span class="text-sm text-gray-500"> {{event.location}} </span>
-        </div>
-
-        <!-- ACTIONS -->
-        <div>
-          <form action="{% url 'delete-event' event.id %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" class="px-2 rounded-md bg-rose-500 text-sm text-white">DELETE</button>
-          </form>
-
-          <a href="{% url 'update-event' event.id %}" class="px-2 rounded-md bg-orange-500 text-sm text-white">UPDATE</a>
-        </div>
+        </div> 
       </div>
     </div>
     {% endfor %}

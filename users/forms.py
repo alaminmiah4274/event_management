@@ -1,9 +1,19 @@
 from django import forms
 from tasks.forms import StyleFormMixin
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 import re
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+    PasswordResetForm,
+    SetPasswordForm,
+)
+from django.contrib.auth import get_user_model
+from users.models import CustomUser
+
+
+User = get_user_model()
 
 
 class CustomSignUpModelForm(StyleFormMixin, forms.ModelForm):
@@ -80,3 +90,21 @@ class AssignRoleForm(StyleFormMixin, forms.Form):
     role = forms.ModelChoiceField(
         queryset=Group.objects.all(), empty_label="Select A Role"
     )
+
+
+class EditProfileForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["email", "first_name", "last_name", "phone_number", "profile_image"]
+
+
+class CustomPasswordChangeForm(StyleFormMixin, PasswordChangeForm):
+    pass
+
+
+class CustomPasswordResetForm(StyleFormMixin, PasswordResetForm):
+    pass
+
+
+class CustomPasswordResetConfirmForm(StyleFormMixin, SetPasswordForm):
+    pass

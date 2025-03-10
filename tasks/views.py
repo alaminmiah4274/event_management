@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from tasks.models import Event, Profile
+from tasks.models import Event
 from django.db.models import Q, Count
 from datetime import date
 from tasks.forms import EventModelForm, CategoryModelForm
@@ -9,7 +9,15 @@ from django.contrib.auth.decorators import (
     login_required,
 )
 from users.views import is_admin
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import CreateView, UpdateView
+from django.urls import reverse_lazy
+from django.views import View
+
+
+User = get_user_model()
 
 
 # Create your views here.
@@ -51,60 +59,75 @@ def add_category(request):
     return render(request, "form/category_form.html", context)
 
 
-@login_required
-@permission_required("tasks.add_event", login_url="no-permission")
-def create_event(request):
-    event_form = EventModelForm()
+# ------
+class EventCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    template_name = "form/event_form.html"
+    success_url = reverse_lazy("create-event")
+    permission_required = "tasks.add_event"
+    login_url = "no-permission"
 
-    if request.method == "POST":
+    def get(self, request, *args, **kwargs):
+        event_form = EventModelForm()
+        context = {"event_form": event_form}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
         event_form = EventModelForm(request.POST, request.FILES)
 
         if event_form.is_valid():
             event_form.save()
-
             messages.success(request, "Event Created Successfully")
-            return redirect("create-event")
         else:
             messages.error(request, "The event date cannot be in the past.")
-            return redirect("create-event")
-
-    context = {"event_form": event_form}
-
-    return render(request, "form/event_form.html", context)
+            # Instead of redirecting on error, we'll render the form with errors
+            context = {"event_form": event_form}
+            return render(request, self.template_name, context)
 
 
-@login_required
-@permission_required("tasks.change_event", login_url="no-permission")
-def update_event(request, id):
-    event = Event.objects.get(id=id)
-    event_form = EventModelForm(instance=event)
+# ----------
+class EventUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    template_name = "form/event_form.html"
+    permission_required = "tasks.change_event"
+    login_url = "no-permission"
+    pk_url_kwarg = "event_id"
 
-    if request.method == "POST":
-        event_form = EventModelForm(request.POST, instance=event)
+    def get(self, request, event_id):
+        event = Event.objects.get(id=event_id)
+        event_form = EventModelForm(instance=event)
+        context = {"event_form": event_form}
+        return render(request, self.template_name, context)
+
+    def post(self, request, event_id):
+        event = Event.objects.get(id=event_id)
+        event_form = EventModelForm(request.POST, request.FILES, instance=event)
 
         if event_form.is_valid():
             event_form.save()
-
             messages.success(request, "Event Updated Successfully")
-            return redirect("update-event", id)
+            return redirect("update-event", event_id=event_id)
 
-    context = {"event_form": event_form}
+        context = {"event_form": event_form}
+        return render(request, self.template_name, context)
 
-    return render(request, "form/event_form.html", context)
 
+# -------
+class EventDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "tasks.delete_event"
+    login_url = "no-permission"
 
-@login_required
-@permission_required("tasks.delete_event", login_url="no-permission")
-def delete_event(request, id):
-    if request.method == "POST":
-        event = Event.objects.get(id=id)
-        event.delete()
+    def post(self, request, id):
+        try:
+            event = Event.objects.get(id=id)
+            event.delete()
+            messages.success(request, "Event Deleted Successfully")
+            return redirect("organizer-dashboard")
+        except Event.DoesNotExist:
+            messages.error(request, "Event not found")
+            return redirect("organizer-dashboard")
 
-        messages.success(request, "Task Deleted Successfully")
-        return redirect("organizer-dashboard")
-    else:
+    def get(self, request, id):
         messages.error(request, "Something Went Wrong")
-        return redirect("delete-event", id)
+        return redirect("delete-event", id=id)
 
 
 @login_required
@@ -130,18 +153,6 @@ def organizer_dashboard(request):
     return render(request, "dashboard/organizer_dashboard.html", context)
 
 
-# def today_events(request):
-#     todays = (
-#         Event.objects.select_related("category")
-#         .prefetch_related("participant")
-#         .filter(date=date.today())
-#     )
-
-#     context = {"todays": todays}
-
-#     return render(request, "today_events/today_events.html", context)
-
-
 @login_required
 def dashboard(request):
     if is_organizer(request.user):
@@ -156,10 +167,8 @@ def dashboard(request):
 
 @login_required
 def participant_dashboard(request):
-    profile = request.user.profile
-    events = profile.event.all().select_related("category")
-
-    print(events)
+    user = request.user
+    events = user.event.all().select_related("category")
 
     context = {"events": events}
 
@@ -171,17 +180,26 @@ def participate(request, event_id):
     if request.method == "POST":
         event = Event.objects.get(id=event_id)
         if request.user.is_authenticated:
-            profile = request.user.profile
-            if event in profile.event.all():
+            user = request.user
+            if event in user.event.all():
                 messages.warning(
                     request, "You have already participated in this event."
                 )
             else:
-                profile.event.add(event)
+                user.event.add(event)
                 messages.success(
                     request, "You have successfully participated in the event."
                 )
                 return redirect("home")
     else:
         messages.error(request, "You must be logged in to participate.")
-        return redirect("home", event.id)
+        return redirect("home")
+
+
+class EventDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = Event
+    template_name = "event_details.html"
+    context_object_name = "event"
+    pk_url_kwarg = "event_id"
+    login_url = "no-permission"
+    permission_required = "tasks.view_event"
