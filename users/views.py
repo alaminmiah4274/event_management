@@ -288,7 +288,7 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
 
 """
-wiz_khalifa: Lifa@2024
+wiz_khalifa: Lifa@2024-->Ifa@2024
 kendra_sunderland: Land@2024
 sabanna_bond: Anna@2024-->Banna@2024
 andrew_tate: Rew@2024 | organizer

@@ -18,7 +18,7 @@
 		<div class="text-center text-3xl mb-5">Create An Event</div>
 		<form method="POST" enctype="multipart/form-data">
 			{% csrf_token %}
-			{{event_form}}
+			{{form}}
 			<button type="submit" class="px-2 py-1 bg-pink-500 rounded-lg text-white mt-5">SUBMIT</button>
 		</form>
 	</div>

@@ -12,7 +12,7 @@ from users.views import is_admin
 from django.contrib.auth import get_user_model
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import UpdateView
 from django.urls import reverse_lazy
 from django.views import View
 
@@ -60,27 +60,27 @@ def add_category(request):
 
 
 # ------
-class EventCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class EventCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "form/event_form.html"
     success_url = reverse_lazy("create-event")
     permission_required = "tasks.add_event"
     login_url = "no-permission"
 
     def get(self, request, *args, **kwargs):
-        event_form = EventModelForm()
-        context = {"event_form": event_form}
+        form = EventModelForm()
+        context = {"form": form}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        event_form = EventModelForm(request.POST, request.FILES)
+        form = EventModelForm(request.POST, request.FILES)
 
-        if event_form.is_valid():
-            event_form.save()
+        if form.is_valid():
+            form.save()
             messages.success(request, "Event Created Successfully")
+            return redirect(self.success_url)
         else:
             messages.error(request, "The event date cannot be in the past.")
-            # Instead of redirecting on error, we'll render the form with errors
-            context = {"event_form": event_form}
+            context = {"form": form}
             return render(request, self.template_name, context)
 
 
@@ -93,20 +93,20 @@ class EventUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
     def get(self, request, event_id):
         event = Event.objects.get(id=event_id)
-        event_form = EventModelForm(instance=event)
-        context = {"event_form": event_form}
+        form = EventModelForm(instance=event)
+        context = {"form": form}
         return render(request, self.template_name, context)
 
     def post(self, request, event_id):
         event = Event.objects.get(id=event_id)
-        event_form = EventModelForm(request.POST, request.FILES, instance=event)
+        form = EventModelForm(request.POST, request.FILES, instance=event)
 
-        if event_form.is_valid():
-            event_form.save()
+        if form.is_valid():
+            form.save()
             messages.success(request, "Event Updated Successfully")
             return redirect("update-event", event_id=event_id)
 
-        context = {"event_form": event_form}
+        context = {"form": form}
         return render(request, self.template_name, context)
 
 
@@ -193,7 +193,7 @@ def participate(request, event_id):
                 return redirect("home")
     else:
         messages.error(request, "You must be logged in to participate.")
-        return redirect("home")
+        return redirect("sign-in")
 
 
 class EventDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
