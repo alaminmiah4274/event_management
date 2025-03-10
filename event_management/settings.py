@@ -92,26 +92,26 @@ WSGI_APPLICATION = "event_management.wsgi.application"
 
 
 # postgreSQL database:
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default=""),
-        "USER": config("DB_USER", default=""),
-        "PASSWORD": config("DB_PASSWORD", default=""),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", cast=int),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": config("DB_NAME", default=""),
+#         "USER": config("DB_USER", default=""),
+#         "PASSWORD": config("DB_PASSWORD", default=""),
+#         "HOST": config("DB_HOST", default="localhost"),
+#         "PORT": config("DB_PORT", cast=int),
+#     }
+# }
 
 
 # render postgres db:
-# DATABASES = {
-#     "default": dj_database_url.config(
-#         # Replace this value with your local database's connection string.
-#         default=config("DEFAULT", default=""),
-#         conn_max_age=600,
-#     )
-# }
+DATABASES = {
+    "default": dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default=config("DEFAULT", default=""),
+        conn_max_age=600,
+    )
+}
 
 # debug toolbar ip
 INTERNAL_IPS = [
