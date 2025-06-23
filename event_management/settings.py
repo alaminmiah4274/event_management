@@ -110,6 +110,8 @@ DATABASES = {
         # Replace this value with your local database's connection string.
         default="postgresql://event_exposer_db_user:LweVgjePCTzrzE4zBfi8Cw7Eu6Zrqjhp@dpg-cv7b27t2ng1s7383m10g-a.oregon-postgres.render.com/event_exposer_db",
         conn_max_age=600,
+        ssl_require=True,
+        conn_max_age=600,
     )
 }
 
